@@ -16,15 +16,15 @@ const scrollToProducts = () => {
         loop
         playsinline
       >
-        <source src="" type="video/mp4" />
+        <source src="/3月13日.mp4" type="video/mp4" />
       </video>
       <!-- 渐变遮罩 -->
       <div class="absolute inset-0 bg-black/30" />
     </div>
 
     <!-- 内容区 -->
-    <div class="relative z-10 max-w-[1200px] mx-auto px-4 text-center -mt-5">
-      <h1 class="text-4xl md:text-5xl font-bold text-white">
+    <div class="relative z-10 max-w-[1200px] mx-auto px-4 text-center -mt-10">
+      <h1 class="font-bold text-white" style="font-size: 54px;">
         数据驱动 · 智联产业 · 链通全球
       </h1>
       <p class="text-lg text-white/90 mt-4 max-w-2xl mx-auto">
