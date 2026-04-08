@@ -12,6 +12,14 @@
   --gutter: 16px;
   --breakpoint-md: 1280px;
   --breakpoint-sm: 768px;
+
+  /* 导航 / 下拉：休息态仅底部分割线（无天翼云式侧向阴影）；展开时整块 drop-shadow */
+  --nav-surface: #ffffff;
+  --nav-border: #eeeeee;
+  --nav-shadow-open-x: 0;
+  --nav-shadow-open-y: 4px;
+  --nav-shadow-open-blur: 16px;
+  --nav-shadow-open-color: rgba(51, 51, 51, 0.2);
 }
 
 * {
@@ -25,7 +33,7 @@ body {
   line-height: 20px;
   font-weight: 400;
   font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
-  background: var(--surface);
+  background: #f7f7f7;
 }
 
 a {
@@ -83,7 +91,7 @@ p {
 
 .site {
   min-height: 100vh;
-  background: #fff;
+  background: #f7f7f7;
 }
 
 .grid-toggle {
@@ -119,20 +127,43 @@ p {
 }
 
 .top-nav {
-  height: 64px;
-  border-bottom: 1px solid var(--line);
   position: sticky;
   top: 0;
-  z-index: 200;
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(4px);
+  z-index: 220;
+  background: transparent;
+}
+
+.nav-shell {
+  position: relative;
+  background: var(--nav-surface);
+}
+
+/* 仅展开时有整块投影；默认 64px 导航无任何阴影 */
+.nav-shell.is-open {
+  filter: drop-shadow(
+    var(--nav-shadow-open-x) var(--nav-shadow-open-y) var(--nav-shadow-open-blur) var(--nav-shadow-open-color)
+  );
 }
 
 .nav-grid {
-  height: 100%;
+  height: 64px;
   align-items: center;
   position: relative;
   z-index: 2;
+}
+
+/* 通屏分割线：1px、全视口宽，贴在 64px 导航行底边 */
+.nav-grid::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 100vw;
+  height: 1px;
+  background: var(--nav-border);
+  pointer-events: none;
+  z-index: 3;
 }
 
 .logo-placeholder {
@@ -186,10 +217,10 @@ p {
 }
 
 .tab-arrow {
-  width: 8px;
-  height: 4px;
+  width: 10px;
+  height: 6px;
   display: inline-block;
-  background: url('/箭头icon.svg') no-repeat center / 8px 4px;
+  background: url('/箭头icon.svg') no-repeat center / 10px 6px;
   transition: transform 0.2s ease;
 }
 
@@ -197,9 +228,13 @@ p {
   color: var(--brand);
 }
 
-.tab:hover .tab-arrow {
+.tab.is-open .tab-arrow {
   background-image: url('/箭头hover.svg');
-  transform: rotate(180deg);
+  transform: none;
+}
+
+.tab.is-open {
+  color: var(--brand);
 }
 
 .login-btn {
@@ -220,9 +255,13 @@ p {
   z-index: 1;
   width: 100%;
   height: 660px;
-  background: #ffffff;
+  background: var(--nav-surface);
   border-top: 1px solid #ececec;
-  box-shadow: 0 0 16px rgba(51, 51, 51, 0.2);
+  overflow: visible;
+}
+
+.nav-shell.is-open .mega-menu {
+  border-top: none;
 }
 
 .mega-wrap {
@@ -233,9 +272,33 @@ p {
   background: #ffffff;
 }
 
+.mega-main-surface {
+  min-width: 0;
+  height: 100%;
+  background: #ffffff;
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #d9d9d9 transparent;
+}
+
+.mega-main-surface::-webkit-scrollbar {
+  width: 6px;
+}
+
+.mega-main-surface::-webkit-scrollbar-thumb {
+  background: #d9d9d9;
+  border-radius: 3px;
+}
+
+.mega-main-surface::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 .mega-side {
   background: #f4f4f4;
-  padding: 28px 20px;
+  padding: 28px 36px 28px 36px;
   position: relative;
 }
 
@@ -254,78 +317,227 @@ p {
   line-height: 32px;
   font-weight: 500;
   color: #333333;
+  text-align: left;
   margin-bottom: 24px;
 }
 
+.mega-side-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 500;
+  text-align: left;
+  margin-bottom: 24px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  color: #333333;
+  transition: color 0.2s ease;
+}
+
+.mega-side-title::after {
+  content: '';
+  width: 8px;
+  height: 14px;
+  display: inline-block;
+  background-color: #333333;
+  -webkit-mask: url('/产品与服务.svg') no-repeat center / 8px 14px;
+  mask: url('/产品与服务.svg') no-repeat center / 8px 14px;
+  transition: background-color 0.2s ease;
+}
+
+.mega-side-title:hover,
+.mega-side-title:focus-visible {
+  color: var(--brand);
+}
+
+.mega-side-title:hover::after,
+.mega-side-title:focus-visible::after {
+  background-color: var(--brand);
+}
+
 .mega-side p {
-  width: 224px;
+  max-width: 224px;
   font-size: 14px;
   line-height: 24px;
   font-weight: 400;
   color: #666666;
-  text-align: justify;
-  text-justify: inter-ideograph;
-  text-align-last: left;
-  margin-bottom: 24px;
+  text-align: left;
+  margin-bottom: 32px;
 }
 
 .mega-side-tabs {
-  display: grid;
-  gap: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
 }
 
-.mega-side-tabs button {
-  height: 44px;
+.mega-side-tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  margin: 0;
+  padding: 0;
   border: 0;
-  background: #ffffff;
-  color: #333333;
+  background: transparent;
   cursor: pointer;
+  font: inherit;
   text-align: left;
-  padding: 0 16px;
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
-.mega-side-tabs button.is-active {
+/* 白底条在文字下层（不用 ::before，避免原生 button 内层级盖住文字） */
+.mega-side-tab__bg {
+  position: absolute;
+  left: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 264px;
+  height: 40px;
+  border-radius: 1px;
+  background: #ffffff;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.mega-side-tab.is-active .mega-side-tab__bg,
+.mega-side-tab:hover .mega-side-tab__bg,
+.mega-side-tab:focus-visible .mega-side-tab__bg {
+  opacity: 1;
+}
+
+.mega-side-tab__label {
+  position: relative;
+  z-index: 1;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  color: #333333;
+}
+
+.mega-side-tab.is-active .mega-side-tab__label,
+.mega-side-tab:hover .mega-side-tab__label,
+.mega-side-tab:focus-visible .mega-side-tab__label {
   color: var(--brand);
+}
+
+.mega-main--service {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.mega-col--wide {
+  grid-column: 1 / -1;
+  max-width: 480px;
+}
+
+.mega-service-lead {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
 }
 
 .mega-main {
-  padding: 24px 28px;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  column-gap: 40px;
-  align-content: start;
+  padding: 24px 32px 0 24px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 24px;
 }
 
-.mega-col h4 {
-  font-size: 28px;
-  line-height: 40px;
-  margin-bottom: 12px;
+.mega-col {
+  width: 248px;
+  height: 300px;
+  padding: 8px 0 0 16px;
+  overflow: hidden;
+}
+
+.mega-l2-title {
+  font-size: 16px;
+  line-height: 24px;
   font-weight: 600;
-}
-
-.mega-col h4.mt {
-  margin-top: 22px;
-}
-
-.mega-col a {
-  display: block;
-  margin-bottom: 12px;
   color: #333333;
-  line-height: 20px;
+  margin-bottom: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.mega-col a:hover {
+.mega-l2-title::after {
+  content: '';
+  width: 6px;
+  height: 10px;
+  display: inline-block;
+  background-color: #333333;
+  -webkit-mask: url('/二级菜单.svg') no-repeat center / 6px 10px;
+  mask: url('/二级菜单.svg') no-repeat center / 6px 10px;
+}
+
+.mega-l3-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.mega-l3-item {
+  display: block;
+}
+
+.mega-l3-name {
+  display: block;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  color: #333333;
+}
+
+.mega-l3-desc {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  color: #666666;
+}
+
+.mega-l3-item:hover .mega-l3-name {
   color: var(--brand);
+}
+
+.mega-l2-title:hover {
+  color: var(--brand);
+}
+
+.mega-l2-title:hover::after {
+  background-color: var(--brand);
 }
 
 .mega-close {
   border: 0;
-  background: transparent;
-  font-size: 28px;
-  color: #999;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  background-color: #333333;
+  -webkit-mask: url('/关闭.svg') no-repeat center / 16px 16px;
+  mask: url('/关闭.svg') no-repeat center / 16px 16px;
   cursor: pointer;
   align-self: start;
-  margin-top: 16px;
+  justify-self: end;
+  margin-top: 36px;
+  transition: background-color 0.2s ease;
+}
+
+.mega-close:hover,
+.mega-close:focus-visible {
+  background-color: var(--brand);
 }
 
 .hero {
@@ -660,6 +872,15 @@ p {
     grid-column: span 3;
   }
 
+  /* M 档：下拉右侧二级菜单固定两列 */
+  .mega-main {
+    display: grid;
+    grid-template-columns: repeat(2, 248px);
+    gap: 24px;
+    justify-content: start;
+    padding: 24px 32px 0 24px;
+  }
+
   .footer-brand {
     grid-column: span 12;
   }
@@ -695,7 +916,12 @@ p {
   }
 
   .top-nav {
-    height: 96px;
+    height: auto;
+  }
+
+  .nav-grid {
+    height: auto;
+    min-height: 96px;
   }
 
   .mega-menu {
@@ -712,14 +938,18 @@ p {
     grid-template-columns: 1fr;
   }
 
-  .mega-side,
-  .mega-main {
+  .mega-side {
     padding: 16px;
   }
 
   .mega-main {
+    padding: 16px;
     grid-template-columns: 1fr;
     gap: 12px;
+  }
+
+  .mega-side-tab__bg {
+    left: 0;
   }
 
   .mega-close {
